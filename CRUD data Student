@@ -1,0 +1,224 @@
+#include<iostream>
+#include<string>
+#include<fstream>
+
+using namespace std;
+
+void getOption(){
+    
+    system("cls");
+    cout<<"Program CRUD data Mahasiswa\n";
+    cout<<"===========================\n";
+    cout<<"1. Create Data Student\n";
+    cout<<"2. Read Data Student\n";
+    cout<<"3. Edit Data Student\n";
+    cout<<"4. Delete Data Student\n";
+    cout<<"5. Finish\n";
+    cout<<"===========================\n";
+    cout<<"choose[1-5] : ";
+    
+   
+}
+
+void checkBaris(int *b){
+    string line;
+    ifstream myFile;
+    myFile.open("Data Mahasiswa.txt");
+    while(getline(myFile,line)){
+        *b += 1;
+    }
+     
+    myFile.close(); 
+}
+string jumlahNIM(string nim){
+    int length;
+    length = nim.length();
+    while(length <= 21){
+        nim = nim + " ";
+        length++; 
+    }
+    return nim;
+}
+
+string jumlahNama(string nama){
+    int length;
+    length = nama.length();
+    while(length <= 26){
+        nama = nama + " ";
+        length++; 
+    }
+    return nama;
+}
+
+string jumlahJurusan(string jurusan){
+    int length;
+    length = jurusan.length();
+    while(length <= 26){
+        jurusan = jurusan + " ";
+        length++; 
+    }
+    return jurusan;
+}
+
+void tambahData(int *b){
+    fstream myFile;
+    string nim, nama, jurusan;
+    
+    myFile.open("Data Mahasiswa.txt", ios::out | ios::app);
+    cin.ignore();
+    cout<<"NIM : ";
+    getline(cin, nim);
+    cout<<"Nama : ";
+    getline(cin, nama);
+    cout<<"Jurusan : ";
+    getline(cin, jurusan);
+
+    
+    
+
+    cout<<"|No   |Pk   |         NIM         |           Nama           |          Jurusan         |\n";
+    cout<<" "<<*b<<"     "<<*b<<"     "<<jumlahNIM(nim)<<jumlahNama(nama)<<jumlahJurusan(jurusan)<<"\n";
+    myFile<<" "<<*b<<"     "<<*b<<"     "<<jumlahNIM(nim)<<jumlahNama(nama)<<jumlahJurusan(jurusan)<<"\n";
+    *b += 1;
+    myFile.close();
+}
+
+void tampilData(){
+    string line;
+    fstream myFile;
+    myFile.open("Data Mahasiswa.txt", ios::in);
+    while(!myFile.eof()){
+        getline(myFile, line);
+        cout<<line<<endl;
+    }
+    myFile.close();
+}
+
+void deleteData(int *b){
+    string line, check_no, Delete, ubah, check_delete;
+    int jumlah_line = *b + 4;
+    int deleteData, check_line = -2;
+    ifstream myFile;
+    myFile.open("Data Mahasiswa.txt"); 
+    ofstream temp;
+    temp.open("temp.txt");
+    cout<<"Pilih Nomor : ";
+    cin>>deleteData;
+    Delete = to_string(deleteData);
+    while(!myFile.eof()){
+        check_line += 1;
+        getline(myFile, line);
+        check_delete = line.substr(0,8);
+        size_t found = check_delete.find(Delete);
+        if(found != string::npos){ 
+        } else {
+            if(check_line != jumlah_line-3){
+                if(check_line > deleteData){
+                    ubah = to_string(check_line-2); 
+                    line[1] = ubah[0];
+                    line[7] = ubah[0];
+                }
+                temp << line <<endl;
+            }
+        }
+            
+    }
+    *b = *b -1;
+    temp.close();
+    myFile.close();
+    remove("Data Mahasiswa.txt");
+    rename("temp.txt","Data Mahasiswa.txt");
+}
+
+void updateInput(ofstream& Temp, int update){
+    string nim, nama, jurusan;
+    cin.ignore();
+    cout<<"NIM : ";
+    getline(cin, nim);
+    cout<<"Nama : ";
+    getline(cin, nama);
+    cout<<"Jurusan : ";
+    getline(cin, jurusan);
+    cout<<"|No   |Pk   |         NIM         |           Nama           |          Jurusan         |\n";
+    cout<<" "<<update<<"     "<<update<<"     "<<jumlahNIM(nim)<<jumlahNama(nama)<<jumlahJurusan(jurusan)<<"\n";
+    Temp<<" "<<update<<"     "<<update<<"     "<<jumlahNIM(nim)<<jumlahNama(nama)<<jumlahJurusan(jurusan)<<"\n";
+
+}
+
+void updateData(int *b){
+    string update, kalimat, check_update;
+    int updateData, jumlah_line = *b + 4,check_line = -2;
+    ifstream myfile;
+    myfile.open("Data Mahasiswa.txt");
+    ofstream Temp;
+    Temp.open("temp.txt");
+    cout<<"Pilih Nomor : ";
+    cin>>updateData;
+    update = to_string(updateData);
+    while(!myfile.eof()){
+        check_line += 1;
+        getline(myfile, kalimat);
+        check_update = kalimat.substr(0,8);
+        size_t find = check_update.find(update);
+        if(find != string::npos){
+            updateInput(Temp, updateData);
+        } else {
+            if(check_line != jumlah_line-3){
+            Temp<< kalimat<< endl;
+            }
+        }
+    }
+    Temp.close();
+    myfile.close();
+    remove("Data Mahasiswa.txt");
+    rename("temp.txt","Data Mahasiswa.txt");
+}
+
+int main(){
+    int pilih, a;
+    int *b = &a;
+    *b = 1;
+    char next;
+    fstream myFile;
+    myFile.open("Data Mahasiswa.txt", ios::out | ios::app);
+    checkBaris(b);
+    if(*b == 1){
+        myFile<<"-----------------------------------------------------------------------------------------\n";
+        myFile<<"|No   |Pk   |         NIM         |           Nama           |          Jurusan         |\n";
+        myFile<<"-----------------------------------------------------------------------------------------\n";
+    } else {
+        *b = *b -3;
+    }
+    myFile.close();
+    do{
+    getOption();
+    cin>>pilih;
+
+    switch(pilih){
+        case 1 :
+            tambahData(b);
+            break;
+        case 2 :
+            tampilData();
+            break;
+        case 3 :
+            tampilData();
+            updateData(b);
+            break;
+        case 4 :
+            tampilData();
+            deleteData(b);
+            break;
+    }
+    if(pilih != 5){
+        cout<<"Next (y/n) : ";
+        cin>>next;
+        if(next == 'n' ){
+            cout<<"Program Finish..."<<endl;
+            exit(0);
+        }
+    }
+    }while(pilih != 5);
+    cout<<"Program Finish..."<<endl;
+    cin.get();
+}
